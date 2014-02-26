@@ -1,0 +1,10 @@
+[Bb]in/
+[Oo]bj/
+
+*.suo
+*.user
+*.sln.docstates
+
+_ReSharper*
+
+packages
