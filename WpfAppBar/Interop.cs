@@ -24,6 +24,33 @@ namespace WpfAppBar
             public RECT rc;
             public IntPtr lParam;
         }
+        
+        [System.Flags]
+        internal enum DWMWINDOWATTRIBUTE
+        {
+            DWMA_NCRENDERING_ENABLED = 1,
+            DWMA_NCRENDERING_POLICY,
+            DWMA_TRANSITIONS_FORCEDISABLED,
+            DWMA_ALLOW_NCPAINT,
+            DWMA_CPATION_BUTTON_BOUNDS,
+            DWMA_NONCLIENT_RTL_LAYOUT,
+            DWMA_FORCE_ICONIC_REPRESENTATION,
+            DWMA_FLIP3D_POLICY,
+            DWMA_EXTENDED_FRAME_BOUNDS,
+            DWMA_HAS_ICONIC_BITMAP,
+            DWMA_DISALLOW_PEEK,
+            DWMA_EXCLUDED_FROM_PEEK,
+            DWMA_LAST
+        }
+
+        [System.Flags]
+        internal enum DWMNCRenderingPolicy
+        {
+            UseWindowStyle,
+            Disabled,
+            Enabled,
+            Last
+        }
 
         internal enum ABMsg : int
         {
@@ -52,5 +79,8 @@ namespace WpfAppBar
 
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         internal static extern int RegisterWindowMessage(string msg);
+        
+        [DllImport("dwmapi.dll")]
+        internal static extern int DwmSetWindowAttribute(IntPtr hWnd, int attr, ref int attrValue, int attrSize);
     }
 }
