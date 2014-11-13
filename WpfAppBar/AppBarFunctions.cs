@@ -99,7 +99,7 @@ namespace WpfAppBar
             abd.cbSize = Marshal.SizeOf(abd);
             abd.hWnd = new WindowInteropHelper(appbarWindow).Handle;
             
-            int renderpolicy;
+            int renderPolicy;
 
             if (edge == ABEdge.None)
             {
