@@ -98,6 +98,8 @@ namespace WpfAppBar
             var abd = new Interop.APPBARDATA();
             abd.cbSize = Marshal.SizeOf(abd);
             abd.hWnd = new WindowInteropHelper(appbarWindow).Handle;
+            
+            int renderpolicy;
 
             if (edge == ABEdge.None)
             {
@@ -107,6 +109,13 @@ namespace WpfAppBar
                     info.IsRegistered = false;
                 }
                 RestoreWindow(appbarWindow);
+                
+                // Restore normal desktop window manager attributes
+                renderPolicy = (int)Interop.DWMNCRenderingPolicy.UseWindowStyle;
+
+                Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_EXCLUDED_FROM_PEEK, ref renderPolicy, sizeof(int));
+                Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_DISALLOW_PEEK, ref renderPolicy, sizeof(int));
+
                 return;
             }
 
@@ -125,6 +134,14 @@ namespace WpfAppBar
             appbarWindow.WindowStyle = WindowStyle.None;
             appbarWindow.ResizeMode = ResizeMode.NoResize;
             appbarWindow.Topmost = true;
+            
+            // Set desktop window manager attributes to prevent window
+            // from being hidden when peeking at the desktop or when
+            // the 'show desktop' button is pressed
+            renderPolicy = (int)Interop.DWMNCRenderingPolicy.Enabled;
+
+            Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_EXCLUDED_FROM_PEEK, ref renderPolicy, sizeof(int));
+            Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_DISALLOW_PEEK, ref renderPolicy, sizeof(int));
 
             ABSetPos(info.Edge, appbarWindow);
         }
