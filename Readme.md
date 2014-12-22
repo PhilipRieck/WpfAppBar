@@ -1,6 +1,8 @@
 WPFAppBar 
 =========
 
+Available via Nuget : [https://www.nuget.org/packages/WpfAppBar/1.1.0](https://www.nuget.org/packages/WpfAppBar/1.1.0)
+
 As seen in this StackOverflow question:
 
 [How do you do AppBar docking (to screen edge, like WinAmp) in WPF?](http://stackoverflow.com/q/75785/12643)
