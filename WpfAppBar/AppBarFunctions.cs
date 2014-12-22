@@ -183,11 +183,11 @@ namespace WpfAppBar
                 if (barData.uEdge == (int)ABEdge.Left)
                 {
                     barData.rc.left = 0;
-                    barData.rc.right = (int)sizeInPixels.X;
+                    barData.rc.right = (int)Math.Round(sizeInPixels.X);
                 }
                 else {
                     barData.rc.right = (int)screenSizeInPixels.X;
-                    barData.rc.left = barData.rc.right - (int)sizeInPixels.X;
+                    barData.rc.left = barData.rc.right - (int)Math.Round(sizeInPixels.X);
                 }
             }
             else
@@ -197,11 +197,11 @@ namespace WpfAppBar
                 if (barData.uEdge == (int)ABEdge.Top)
                 {
                     barData.rc.top = 0;
-                    barData.rc.bottom = (int)sizeInPixels.Y;
+                    barData.rc.bottom = (int)Math.Round(sizeInPixels.Y);
                 }
                 else {
                     barData.rc.bottom = (int)screenSizeInPixels.Y;
-                    barData.rc.top = barData.rc.bottom - (int)sizeInPixels.Y;
+                    barData.rc.top = barData.rc.bottom - (int)Math.Round(sizeInPixels.Y);
                 }
             }
 
