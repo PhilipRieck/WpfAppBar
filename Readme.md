@@ -1,7 +1,7 @@
 WPFAppBar 
 =========
 
-Available via Nuget : [https://www.nuget.org/packages/WpfAppBar/1.1.0](https://www.nuget.org/packages/WpfAppBar/1.1.0)
+Available via Nuget : [https://www.nuget.org/packages/WpfAppBar/1.1.0](https://www.nuget.org/packages/WpfAppBar)
 
 As seen in this StackOverflow question:
 
