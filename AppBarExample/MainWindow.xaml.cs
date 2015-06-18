@@ -37,7 +37,7 @@ namespace AppBarExample
         {
             AppBar.IsEnabled = false;
             Normal.IsEnabled = true;
-            AppBarFunctions.SetAppBar(this, ABEdge.Left);
+            AppBarFunctions.SetAppBar(this, ABEdge.Left, grid);
         }
     }
 }

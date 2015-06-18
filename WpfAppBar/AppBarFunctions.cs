@@ -19,7 +19,6 @@ namespace WpfAppBar
     public static class AppBarFunctions
     {
        
-
         private class RegisterInfo
         {
             public int CallbackId { get; set; }
@@ -30,7 +29,7 @@ namespace WpfAppBar
             public Point OriginalPosition { get; set; }
             public Size OriginalSize { get; set; }
             public ResizeMode OriginalResizeMode { get; set; }
-
+            public FrameworkElement ChildElement { get; set; }
 
             public IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam,
                                     IntPtr lParam, ref bool handled)
@@ -39,7 +38,7 @@ namespace WpfAppBar
                 {
                     if (wParam.ToInt32() == (int)Interop.ABNotify.ABN_POSCHANGED)
                     {
-                        ABSetPos(Edge, Window);
+                        ABSetPos(Edge, Window, ChildElement);
                         handled = true;
                     }
                 }
@@ -90,10 +89,11 @@ namespace WpfAppBar
 
         }
 
-        public static void SetAppBar(Window appbarWindow, ABEdge edge)
+        public static void SetAppBar(Window appbarWindow, ABEdge edge, FrameworkElement childElement = null)
         {
             var info = GetRegisterInfo(appbarWindow);
             info.Edge = edge;
+            info.ChildElement = childElement;
 
             var abd = new Interop.APPBARDATA();
             abd.cbSize = Marshal.SizeOf(abd);
@@ -143,7 +143,7 @@ namespace WpfAppBar
             Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_EXCLUDED_FROM_PEEK, ref renderPolicy, sizeof(int));
             Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_DISALLOW_PEEK, ref renderPolicy, sizeof(int));
 
-            ABSetPos(info.Edge, appbarWindow);
+            ABSetPos(info.Edge, appbarWindow, childElement);
         }
 
         private delegate void ResizeDelegate(Window appbarWindow, Rect rect);
@@ -155,9 +155,7 @@ namespace WpfAppBar
             appbarWindow.Left = rect.Left;
         }
 
-
-
-        private static void ABSetPos(ABEdge edge, Window appbarWindow)
+        private static void ABSetPos(ABEdge edge, Window appbarWindow, FrameworkElement childElement)
         {
             var barData = new Interop.APPBARDATA();
             barData.cbSize = Marshal.SizeOf(barData);
@@ -170,7 +168,9 @@ namespace WpfAppBar
             var toWpfUnit = PresentationSource.FromVisual(appbarWindow).CompositionTarget.TransformFromDevice;
 
             // Transform window size from wpf units (1/96 ") to real pixels, for win32 usage
-            var sizeInPixels = toPixel.Transform(new Vector(appbarWindow.ActualWidth, appbarWindow.ActualHeight));
+            var sizeInPixels = (childElement != null ?
+                toPixel.Transform(new Vector(childElement.ActualWidth, childElement.ActualHeight)) :
+                toPixel.Transform(new Vector(appbarWindow.ActualWidth, appbarWindow.ActualHeight)));
             // Even if the documentation says SystemParameters.PrimaryScreen{Width, Height} return values in 
             // "pixels", they return wpf units instead.
             var screenSizeInPixels =
