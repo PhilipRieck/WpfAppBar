@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace WpfAppBar
-{
-    class Interop
-    {
+namespace WpfAppBar {
+    class Interop {
         [StructLayout(LayoutKind.Sequential)]
-        internal struct RECT
-        {
+        internal struct RECT {
             public int left;
             public int top;
             public int right;
@@ -15,8 +12,7 @@ namespace WpfAppBar
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct APPBARDATA
-        {
+        internal struct APPBARDATA {
             public int cbSize;
             public IntPtr hWnd;
             public int uCallbackMessage;
@@ -24,10 +20,9 @@ namespace WpfAppBar
             public RECT rc;
             public IntPtr lParam;
         }
-        
+
         [System.Flags]
-        internal enum DWMWINDOWATTRIBUTE
-        {
+        internal enum DWMWINDOWATTRIBUTE {
             DWMA_NCRENDERING_ENABLED = 1,
             DWMA_NCRENDERING_POLICY,
             DWMA_TRANSITIONS_FORCEDISABLED,
@@ -44,16 +39,14 @@ namespace WpfAppBar
         }
 
         [System.Flags]
-        internal enum DWMNCRenderingPolicy
-        {
+        internal enum DWMNCRenderingPolicy {
             UseWindowStyle,
             Disabled,
             Enabled,
             Last
         }
 
-        internal enum ABMsg : int
-        {
+        internal enum ABMsg : int {
             ABM_NEW = 0,
             ABM_REMOVE,
             ABM_QUERYPOS,
@@ -66,8 +59,7 @@ namespace WpfAppBar
             ABM_WINDOWPOSCHANGED,
             ABM_SETSTATE
         }
-        internal enum ABNotify : int
-        {
+        internal enum ABNotify : int {
             ABN_STATECHANGE = 0,
             ABN_POSCHANGED,
             ABN_FULLSCREENAPP,
@@ -79,7 +71,7 @@ namespace WpfAppBar
 
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         internal static extern int RegisterWindowMessage(string msg);
-        
+
         [DllImport("dwmapi.dll")]
         internal static extern int DwmSetWindowAttribute(IntPtr hWnd, int attr, ref int attrValue, int attrSize);
     }
