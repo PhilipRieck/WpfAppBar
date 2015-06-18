@@ -5,10 +5,8 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
 
-namespace WpfAppBar
-{
-    public enum ABEdge : int
-    {
+namespace WpfAppBar {
+    public enum ScreenEdge : int {
         Left = 0,
         Top,
         Right,
@@ -16,54 +14,44 @@ namespace WpfAppBar
         None
     }
 
-    public static class AppBarFunctions
-    {
-       
-
-        private class RegisterInfo
-        {
+    public static class AppBarFunctions {
+        private class RegisterInfo {
             public int CallbackId { get; set; }
             public bool IsRegistered { get; set; }
             public Window Window { get; set; }
-            public ABEdge Edge { get; set; }
+            public ScreenEdge Edge { get; set; }
             public WindowStyle OriginalStyle { get; set; }
             public Point OriginalPosition { get; set; }
             public Size OriginalSize { get; set; }
             public ResizeMode OriginalResizeMode { get; set; }
-
+            public FrameworkElement ChildElement { get; set; }
 
             public IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam,
-                                    IntPtr lParam, ref bool handled)
-            {
-                if (msg == CallbackId)
-                {
-                    if (wParam.ToInt32() == (int)Interop.ABNotify.ABN_POSCHANGED)
-                    {
-                        ABSetPos(Edge, Window);
+                                    IntPtr lParam, ref bool handled) {
+                if(msg == CallbackId) {
+                    if(wParam.ToInt32() == (int)Interop.ABNotify.ABN_POSCHANGED) {
+                        ABSetPos(Edge, Window, ChildElement);
                         handled = true;
                     }
                 }
                 return IntPtr.Zero;
             }
-
         }
+
         private static readonly Dictionary<Window, RegisterInfo> RegisteredWindowInfo
             = new Dictionary<Window, RegisterInfo>();
-        private static RegisterInfo GetRegisterInfo(Window appbarWindow)
-        {
+
+        private static RegisterInfo GetRegisterInfo(Window appbarWindow) {
             RegisterInfo reg;
-            if (RegisteredWindowInfo.ContainsKey(appbarWindow))
-            {
+            if(RegisteredWindowInfo.ContainsKey(appbarWindow)) {
                 reg = RegisteredWindowInfo[appbarWindow];
             }
-            else
-            {
-                reg = new RegisterInfo()
-                {
+            else {
+                reg = new RegisterInfo() {
                     CallbackId = 0,
                     Window = appbarWindow,
                     IsRegistered = false,
-                    Edge = ABEdge.Top,
+                    Edge = ScreenEdge.Top,
                     OriginalStyle = appbarWindow.WindowStyle,
                     OriginalPosition = new Point(appbarWindow.Left, appbarWindow.Top),
                     OriginalSize =
@@ -75,8 +63,7 @@ namespace WpfAppBar
             return reg;
         }
 
-        private static void RestoreWindow(Window appbarWindow)
-        {
+        private static void RestoreWindow(Window appbarWindow) {
             var info = GetRegisterInfo(appbarWindow);
 
             appbarWindow.WindowStyle = info.OriginalStyle;
@@ -90,26 +77,24 @@ namespace WpfAppBar
 
         }
 
-        public static void SetAppBar(Window appbarWindow, ABEdge edge)
-        {
+        public static void SetAppBar(Window appbarWindow, ScreenEdge edge, FrameworkElement childElement = null) {
             var info = GetRegisterInfo(appbarWindow);
             info.Edge = edge;
+            info.ChildElement = childElement;
 
             var abd = new Interop.APPBARDATA();
             abd.cbSize = Marshal.SizeOf(abd);
             abd.hWnd = new WindowInteropHelper(appbarWindow).Handle;
-            
+
             int renderPolicy;
 
-            if (edge == ABEdge.None)
-            {
-                if (info.IsRegistered)
-                {
+            if(edge == ScreenEdge.None) {
+                if(info.IsRegistered) {
                     Interop.SHAppBarMessage((int)Interop.ABMsg.ABM_REMOVE, ref abd);
                     info.IsRegistered = false;
                 }
                 RestoreWindow(appbarWindow);
-                
+
                 // Restore normal desktop window manager attributes
                 renderPolicy = (int)Interop.DWMNCRenderingPolicy.UseWindowStyle;
 
@@ -119,8 +104,7 @@ namespace WpfAppBar
                 return;
             }
 
-            if (!info.IsRegistered)
-            {
+            if(!info.IsRegistered) {
                 info.IsRegistered = true;
                 info.CallbackId = Interop.RegisterWindowMessage("AppBarMessage");
                 abd.uCallbackMessage = info.CallbackId;
@@ -134,7 +118,7 @@ namespace WpfAppBar
             appbarWindow.WindowStyle = WindowStyle.None;
             appbarWindow.ResizeMode = ResizeMode.NoResize;
             appbarWindow.Topmost = true;
-            
+
             // Set desktop window manager attributes to prevent window
             // from being hidden when peeking at the desktop or when
             // the 'show desktop' button is pressed
@@ -143,22 +127,19 @@ namespace WpfAppBar
             Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_EXCLUDED_FROM_PEEK, ref renderPolicy, sizeof(int));
             Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_DISALLOW_PEEK, ref renderPolicy, sizeof(int));
 
-            ABSetPos(info.Edge, appbarWindow);
+            ABSetPos(info.Edge, appbarWindow, childElement);
         }
 
         private delegate void ResizeDelegate(Window appbarWindow, Rect rect);
-        private static void DoResize(Window appbarWindow, Rect rect)
-        {
+
+        private static void DoResize(Window appbarWindow, Rect rect) {
             appbarWindow.Width = rect.Width;
             appbarWindow.Height = rect.Height;
             appbarWindow.Top = rect.Top;
             appbarWindow.Left = rect.Left;
         }
 
-
-
-        private static void ABSetPos(ABEdge edge, Window appbarWindow)
-        {
+        private static void ABSetPos(ScreenEdge edge, Window appbarWindow, FrameworkElement childElement) {
             var barData = new Interop.APPBARDATA();
             barData.cbSize = Marshal.SizeOf(barData);
             barData.hWnd = new WindowInteropHelper(appbarWindow).Handle;
@@ -170,18 +151,19 @@ namespace WpfAppBar
             var toWpfUnit = PresentationSource.FromVisual(appbarWindow).CompositionTarget.TransformFromDevice;
 
             // Transform window size from wpf units (1/96 ") to real pixels, for win32 usage
-            var sizeInPixels = toPixel.Transform(new Vector(appbarWindow.ActualWidth, appbarWindow.ActualHeight));
+            var sizeInPixels = (childElement != null ?
+                toPixel.Transform(new Vector(childElement.ActualWidth, childElement.ActualHeight)) :
+                toPixel.Transform(new Vector(appbarWindow.ActualWidth, appbarWindow.ActualHeight)));
+             
             // Even if the documentation says SystemParameters.PrimaryScreen{Width, Height} return values in 
             // "pixels", they return wpf units instead.
             var screenSizeInPixels =
                 toPixel.Transform(new Vector(SystemParameters.PrimaryScreenWidth, SystemParameters.PrimaryScreenHeight));
 
-            if (barData.uEdge == (int)ABEdge.Left || barData.uEdge == (int)ABEdge.Right)
-            {
+            if(barData.uEdge == (int)ScreenEdge.Left || barData.uEdge == (int)ScreenEdge.Right) {
                 barData.rc.top = 0;
                 barData.rc.bottom = (int)screenSizeInPixels.Y;
-                if (barData.uEdge == (int)ABEdge.Left)
-                {
+                if(barData.uEdge == (int)ScreenEdge.Left) {
                     barData.rc.left = 0;
                     barData.rc.right = (int)Math.Round(sizeInPixels.X);
                 }
@@ -190,12 +172,10 @@ namespace WpfAppBar
                     barData.rc.left = barData.rc.right - (int)Math.Round(sizeInPixels.X);
                 }
             }
-            else
-            {
+            else {
                 barData.rc.left = 0;
                 barData.rc.right = (int)screenSizeInPixels.X;
-                if (barData.uEdge == (int)ABEdge.Top)
-                {
+                if(barData.uEdge == (int)ScreenEdge.Top) {
                     barData.rc.top = 0;
                     barData.rc.bottom = (int)Math.Round(sizeInPixels.Y);
                 }
@@ -210,7 +190,7 @@ namespace WpfAppBar
 
             // transform back to wpf units, for wpf window resizing in DoResize. 
             var location = toWpfUnit.Transform(new Point(barData.rc.left, barData.rc.top));
-            var dimension = toWpfUnit.Transform(new Vector(barData.rc.right - barData.rc.left, 
+            var dimension = toWpfUnit.Transform(new Vector(barData.rc.right - barData.rc.left,
                 barData.rc.bottom - barData.rc.top));
 
             var rect = new Rect(location, new Size(dimension.X, dimension.Y));

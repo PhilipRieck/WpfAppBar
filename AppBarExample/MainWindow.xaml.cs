@@ -30,14 +30,14 @@ namespace AppBarExample
         {
             Normal.IsEnabled = false;
             AppBar.IsEnabled = true;
-            AppBarFunctions.SetAppBar(this, ABEdge.None);
+            AppBarFunctions.SetAppBar(this, ScreenEdge.None);
         }
 
         private void AppBar_OnClick(object sender, RoutedEventArgs e)
         {
             AppBar.IsEnabled = false;
             Normal.IsEnabled = true;
-            AppBarFunctions.SetAppBar(this, ABEdge.Left);
+            AppBarFunctions.SetAppBar(this, ScreenEdge.Left, grid);
         }
     }
 }
