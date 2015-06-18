@@ -174,7 +174,7 @@ namespace WpfAppBar
             // Even if the documentation says SystemParameters.PrimaryScreen{Width, Height} return values in 
             // "pixels", they return wpf units instead.
             var screenSizeInPixels =
-                toPixel.Transform(new Vector(SystemParameters.PrimaryScreenWidth, SystemParameters.PrimaryScreenHeight));
+                toPixel.Transform(new Vector(SystemParameters.WorkArea.Width, SystemParameters.WorkArea.Height));
 
             if (barData.uEdge == (int)ABEdge.Left || barData.uEdge == (int)ABEdge.Right)
             {
