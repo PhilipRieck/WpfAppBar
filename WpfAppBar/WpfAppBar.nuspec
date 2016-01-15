@@ -9,7 +9,7 @@
     <projectUrl>http://stackoverflow.com/a/84987/12643</projectUrl>    
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Initial Release</releaseNotes>
+    <releaseNotes>Workarea issues fixed</releaseNotes>
     <copyright>Creative Commons CC0 ( https://creativecommons.org/publicdomain/zero/1.0/ )</copyright>
     <tags>WPF AppBar</tags>
   </metadata>
