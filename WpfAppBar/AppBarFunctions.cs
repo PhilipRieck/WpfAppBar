@@ -178,29 +178,29 @@ namespace WpfAppBar
 
             if (barData.uEdge == (int)ABEdge.Left || barData.uEdge == (int)ABEdge.Right)
             {
-                barData.rc.top = 0;
-                barData.rc.bottom = (int)screenSizeInPixels.Y;
+                barData.rc.top = (int)SystemParameters.WorkArea.Top;
+                barData.rc.bottom = (int) SystemParameters.WorkArea.Bottom;
                 if (barData.uEdge == (int)ABEdge.Left)
                 {
-                    barData.rc.left = 0;
+                    barData.rc.left = (int)SystemParameters.WorkArea.Left;
                     barData.rc.right = (int)Math.Round(sizeInPixels.X);
                 }
                 else {
-                    barData.rc.right = (int)screenSizeInPixels.X;
+                    barData.rc.right = (int)SystemParameters.WorkArea.Right;
                     barData.rc.left = barData.rc.right - (int)Math.Round(sizeInPixels.X);
                 }
             }
             else
             {
-                barData.rc.left = 0;
-                barData.rc.right = (int)screenSizeInPixels.X;
+                barData.rc.left = (int)SystemParameters.WorkArea.Left;
+                barData.rc.right = (int)SystemParameters.WorkArea.Right;
                 if (barData.uEdge == (int)ABEdge.Top)
                 {
-                    barData.rc.top = 0;
+                    barData.rc.top = (int)SystemParameters.WorkArea.Top;
                     barData.rc.bottom = (int)Math.Round(sizeInPixels.Y);
                 }
                 else {
-                    barData.rc.bottom = (int)screenSizeInPixels.Y;
+                    barData.rc.bottom = (int)SystemParameters.WorkArea.Bottom;
                     barData.rc.top = barData.rc.bottom - (int)Math.Round(sizeInPixels.Y);
                 }
             }
