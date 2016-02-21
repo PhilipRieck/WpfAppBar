@@ -19,15 +19,15 @@ To use, just call this code from anywhere within a normal wpf window (say a butt
 
 ```C#
 //Make the window an appbar:
-AppBarFunctions.SetAppBar(this, ScreenEdge.Right);
+AppBarFunctions.SetAppBar(this, ABEdge.Right);
 
 // If you want to resize the window by its content:
-AppBarFunctions.SetAppBar(this, ScreenEdge.Right, grid);
-AppBarFunctions.SetAppBar(this, ScreenEdge.Right, wrapPanel);
+AppBarFunctions.SetAppBar(this, ABEdge.Right, grid);
+AppBarFunctions.SetAppBar(this, ABEdge.Right, wrapPanel);
 // etc...
 
 //Restore the window to a normal window:
-AppBarFunctions.SetAppBar(this, ScreenEdge.None);
+AppBarFunctions.SetAppBar(this, ABEdge.None);
 ```
 
 I found a bug!
