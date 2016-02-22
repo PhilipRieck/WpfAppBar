@@ -29,6 +29,7 @@ namespace WpfAppBar
             public Point OriginalPosition { get; set; }
             public Size OriginalSize { get; set; }
             public ResizeMode OriginalResizeMode { get; set; }
+            public bool OriginalTopmost { get; set; }
             public FrameworkElement ChildElement { get; set; }
 
             public IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam,
@@ -68,6 +69,7 @@ namespace WpfAppBar
                     OriginalSize =
                         new Size(appbarWindow.ActualWidth, appbarWindow.ActualHeight),
                     OriginalResizeMode = appbarWindow.ResizeMode,
+                    OriginalTopmost = appbarWindow.Topmost,
                 };
                 RegisteredWindowInfo.Add(appbarWindow, reg);
             }
@@ -80,7 +82,7 @@ namespace WpfAppBar
 
             appbarWindow.WindowStyle = info.OriginalStyle;
             appbarWindow.ResizeMode = info.OriginalResizeMode;
-            appbarWindow.Topmost = false;
+            appbarWindow.Topmost = info.OriginalTopmost;
 
             var rect = new Rect(info.OriginalPosition.X, info.OriginalPosition.Y,
                 info.OriginalSize.Width, info.OriginalSize.Height);
