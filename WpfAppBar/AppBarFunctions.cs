@@ -32,6 +32,9 @@ namespace WpfAppBar
             public bool OriginalTopmost { get; set; }
             public FrameworkElement ChildElement { get; set; }
 
+            
+            public Rect? DockedSize { get; set; }
+
             public IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam,
                                     IntPtr lParam, ref bool handled)
             {
@@ -39,7 +42,7 @@ namespace WpfAppBar
                 {
                     if (wParam.ToInt32() == (int)Interop.ABNotify.ABN_POSCHANGED)
                     {
-                        ABSetPos(Edge, Window, ChildElement);
+                        ABSetPos(this, Window, ChildElement);
                         handled = true;
                     }
                 }
@@ -70,6 +73,8 @@ namespace WpfAppBar
                         new Size(appbarWindow.ActualWidth, appbarWindow.ActualHeight),
                     OriginalResizeMode = appbarWindow.ResizeMode,
                     OriginalTopmost = appbarWindow.Topmost,
+                    DockedSize = null
+                
                 };
                 RegisteredWindowInfo.Add(appbarWindow, reg);
             }
@@ -83,6 +88,8 @@ namespace WpfAppBar
             appbarWindow.WindowStyle = info.OriginalStyle;
             appbarWindow.ResizeMode = info.OriginalResizeMode;
             appbarWindow.Topmost = info.OriginalTopmost;
+            
+            info.DockedSize = null;
 
             var rect = new Rect(info.OriginalPosition.X, info.OriginalPosition.Y,
                 info.OriginalSize.Width, info.OriginalSize.Height);
@@ -145,7 +152,7 @@ namespace WpfAppBar
             Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_EXCLUDED_FROM_PEEK, ref renderPolicy, sizeof(int));
             Interop.DwmSetWindowAttribute(abd.hWnd, (int)Interop.DWMWINDOWATTRIBUTE.DWMA_DISALLOW_PEEK, ref renderPolicy, sizeof(int));
 
-            ABSetPos(info.Edge, appbarWindow, childElement);
+            ABSetPos(info, appbarWindow, childElement);
         }
 
         private delegate void ResizeDelegate(Window appbarWindow, Rect rect);
@@ -157,8 +164,9 @@ namespace WpfAppBar
             appbarWindow.Left = rect.Left;
         }
 
-        private static void ABSetPos(ABEdge edge, Window appbarWindow, FrameworkElement childElement)
+        private static void ABSetPos(RegisterInfo info, Window appbarWindow, FrameworkElement childElement)
         {
+            var edge = info.Edge;
             var barData = new Interop.APPBARDATA();
             barData.cbSize = Marshal.SizeOf(barData);
             barData.hWnd = new WindowInteropHelper(appbarWindow).Handle;
@@ -178,31 +186,33 @@ namespace WpfAppBar
             var screenSizeInPixels =
                 toPixel.Transform(new Vector(SystemParameters.WorkArea.Width, SystemParameters.WorkArea.Height));
 
+            var actualWorkArea = GetActualWorkArea(info);
+
             if (barData.uEdge == (int)ABEdge.Left || barData.uEdge == (int)ABEdge.Right)
             {
-                barData.rc.top = (int)SystemParameters.WorkArea.Top;
-                barData.rc.bottom = (int) SystemParameters.WorkArea.Bottom;
+                barData.rc.top = (int)actualWorkArea.Top;
+                barData.rc.bottom = (int)actualWorkArea.Bottom;
                 if (barData.uEdge == (int)ABEdge.Left)
                 {
-                    barData.rc.left = (int)SystemParameters.WorkArea.Left;
+                    barData.rc.left = (int)actualWorkArea.Left;
                     barData.rc.right = (int)Math.Round(sizeInPixels.X);
                 }
                 else {
-                    barData.rc.right = (int)SystemParameters.WorkArea.Right;
+                    barData.rc.right = (int)actualWorkArea.Right;
                     barData.rc.left = barData.rc.right - (int)Math.Round(sizeInPixels.X);
                 }
             }
             else
             {
-                barData.rc.left = (int)SystemParameters.WorkArea.Left;
-                barData.rc.right = (int)SystemParameters.WorkArea.Right;
+                barData.rc.left = (int)actualWorkArea.Left;
+                barData.rc.right = (int)actualWorkArea.Right;
                 if (barData.uEdge == (int)ABEdge.Top)
                 {
-                    barData.rc.top = (int)SystemParameters.WorkArea.Top;
+                    barData.rc.top = (int)actualWorkArea.Top;
                     barData.rc.bottom = (int)Math.Round(sizeInPixels.Y);
                 }
                 else {
-                    barData.rc.bottom = (int)SystemParameters.WorkArea.Bottom;
+                    barData.rc.bottom = (int)actualWorkArea.Bottom;
                     barData.rc.top = barData.rc.bottom - (int)Math.Round(sizeInPixels.Y);
                 }
             }
@@ -216,11 +226,22 @@ namespace WpfAppBar
                 barData.rc.bottom - barData.rc.top));
 
             var rect = new Rect(location, new Size(dimension.X, dimension.Y));
+            info.DockedSize = rect;
 
             //This is done async, because WPF will send a resize after a new appbar is added.  
             //if we size right away, WPFs resize comes last and overrides us.
             appbarWindow.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle,
                 new ResizeDelegate(DoResize), appbarWindow, rect);
+        }
+
+        private static Rect GetActualWorkArea(RegisterInfo info)
+        {
+            var wa = SystemParameters.WorkArea;
+            if (info.DockedSize != null)
+            {
+                wa.Union(info.DockedSize.Value);
+            }
+            return wa;
         }
     }
 }
