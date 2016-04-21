@@ -98,7 +98,7 @@ namespace WpfAppBar
 
         }
 
-        public static void SetAppBar(Window appbarWindow, ABEdge edge, FrameworkElement childElement = null)
+        public static void SetAppBar(Window appbarWindow, ABEdge edge, FrameworkElement childElement = null, bool topMost = true)
         {
             var info = GetRegisterInfo(appbarWindow);
             info.Edge = edge;
@@ -142,8 +142,8 @@ namespace WpfAppBar
 
             appbarWindow.WindowStyle = WindowStyle.None;
             appbarWindow.ResizeMode = ResizeMode.NoResize;
-            appbarWindow.Topmost = true;
-            
+            appbarWindow.Topmost = topMost;
+
             // Set desktop window manager attributes to prevent window
             // from being hidden when peeking at the desktop or when
             // the 'show desktop' button is pressed
