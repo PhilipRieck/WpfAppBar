@@ -98,7 +98,7 @@ namespace WpfAppBar
 
         }
 
-        public static void SetAppBar(Window appbarWindow, ABEdge edge, FrameworkElement childElement = null)
+        public static void SetAppBar(Window appbarWindow, ABEdge edge, FrameworkElement childElement = null, bool topMost = true)
         {
             var info = GetRegisterInfo(appbarWindow);
             info.Edge = edge;
@@ -142,8 +142,8 @@ namespace WpfAppBar
 
             appbarWindow.WindowStyle = WindowStyle.None;
             appbarWindow.ResizeMode = ResizeMode.NoResize;
-            appbarWindow.Topmost = true;
-            
+            appbarWindow.Topmost = topMost;
+
             // Set desktop window manager attributes to prevent window
             // from being hidden when peeking at the desktop or when
             // the 'show desktop' button is pressed
@@ -183,36 +183,38 @@ namespace WpfAppBar
                 toPixel.Transform(new Vector(appbarWindow.ActualWidth, appbarWindow.ActualHeight)));
             // Even if the documentation says SystemParameters.PrimaryScreen{Width, Height} return values in 
             // "pixels", they return wpf units instead.
-            var screenSizeInPixels =
-                toPixel.Transform(new Vector(SystemParameters.WorkArea.Width, SystemParameters.WorkArea.Height));
-
             var actualWorkArea = GetActualWorkArea(info);
+            var screenSizeInPixels =
+                toPixel.Transform(new Vector(actualWorkArea.Width, actualWorkArea.Height));
+            var workTopLeftInPixels =
+                toPixel.Transform(new Point(actualWorkArea.Left, actualWorkArea.Top));
+            var workAreaInPixelsF = new Rect(workTopLeftInPixels, screenSizeInPixels);
 
             if (barData.uEdge == (int)ABEdge.Left || barData.uEdge == (int)ABEdge.Right)
             {
-                barData.rc.top = (int)actualWorkArea.Top;
-                barData.rc.bottom = (int)actualWorkArea.Bottom;
+                barData.rc.top = (int)workAreaInPixelsF.Top;
+                barData.rc.bottom = (int)workAreaInPixelsF.Bottom;
                 if (barData.uEdge == (int)ABEdge.Left)
                 {
-                    barData.rc.left = (int)actualWorkArea.Left;
+                    barData.rc.left = (int)workAreaInPixelsF.Left;
                     barData.rc.right = (int)Math.Round(sizeInPixels.X);
                 }
                 else {
-                    barData.rc.right = (int)actualWorkArea.Right;
+                    barData.rc.right = (int)workAreaInPixelsF.Right;
                     barData.rc.left = barData.rc.right - (int)Math.Round(sizeInPixels.X);
                 }
             }
             else
             {
-                barData.rc.left = (int)actualWorkArea.Left;
-                barData.rc.right = (int)actualWorkArea.Right;
+                barData.rc.left = (int)workAreaInPixelsF.Left;
+                barData.rc.right = (int)workAreaInPixelsF.Right;
                 if (barData.uEdge == (int)ABEdge.Top)
                 {
-                    barData.rc.top = (int)actualWorkArea.Top;
+                    barData.rc.top = (int)workAreaInPixelsF.Top;
                     barData.rc.bottom = (int)Math.Round(sizeInPixels.Y);
                 }
                 else {
-                    barData.rc.bottom = (int)actualWorkArea.Bottom;
+                    barData.rc.bottom = (int)workAreaInPixelsF.Bottom;
                     barData.rc.top = barData.rc.bottom - (int)Math.Round(sizeInPixels.Y);
                 }
             }
