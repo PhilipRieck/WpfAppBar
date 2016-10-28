@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Threading;
 
@@ -238,7 +239,9 @@ namespace WpfAppBar
 
         private static Rect GetActualWorkArea(RegisterInfo info)
         {
-            var wa = SystemParameters.WorkArea;
+            var cwa = Screen.FromHandle(new WindowInteropHelper(info.Window).Handle).WorkingArea;
+            var wa = new Rect(new Point(cwa.Left, cwa.Top), new Point(cwa.Right, cwa.Bottom));
+
             if (info.DockedSize != null)
             {
                 wa.Union(info.DockedSize.Value);
