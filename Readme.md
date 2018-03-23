@@ -7,6 +7,10 @@ As seen in this StackOverflow question:
 
 [How do you do AppBar docking (to screen edge, like WinAmp) in WPF?](http://stackoverflow.com/q/75785/12643)
 
+Looking for a WinForms version:
+https://github.com/tip2tail/t2tWinFormAppBarLib
+
+
 What is it?
 ----------
 A helper for turning a WPF window into an "AppBar" like the Windows taskbar.
