@@ -197,7 +197,9 @@ namespace WpfAppBar
                 if (barData.uEdge == (int)ABEdge.Left)
                 {
                     barData.rc.left = (int)workAreaInPixelsF.Left;
-                    barData.rc.right = (int)Math.Round(sizeInPixels.X);
+                    //Left might not always be zero so we need to accommodate for that.
+                    //For example, if the Start Menu is docked LEFT, if we don't do the math, we'll end up with a negative size error
+                    barData.rc.right = barData.rc.left + (int)Math.Round(sizeInPixels.X);
                 }
                 else {
                     barData.rc.right = (int)workAreaInPixelsF.Right;
@@ -211,7 +213,9 @@ namespace WpfAppBar
                 if (barData.uEdge == (int)ABEdge.Top)
                 {
                     barData.rc.top = (int)workAreaInPixelsF.Top;
-                    barData.rc.bottom = (int)Math.Round(sizeInPixels.Y);
+                    //Top might not always be zero so we need to accommodate for that.
+                    //For example, if the Start Menu is docked TOP, if we don't do the math, we'll end up with a negative size error
+                    barData.rc.bottom = barData.rc.top + (int)Math.Round(sizeInPixels.Y);
                 }
                 else {
                     barData.rc.bottom = (int)workAreaInPixelsF.Bottom;
@@ -224,8 +228,9 @@ namespace WpfAppBar
 
             // transform back to wpf units, for wpf window resizing in DoResize. 
             var location = toWpfUnit.Transform(new Point(barData.rc.left, barData.rc.top));
-            var dimension = toWpfUnit.Transform(new Vector(barData.rc.right - barData.rc.left, 
-                barData.rc.bottom - barData.rc.top));
+            var dimension = toWpfUnit.Transform(new Vector(
+                (barData.rc.right - barData.rc.left), 
+                (barData.rc.bottom - barData.rc.top)));
 
             var rect = new Rect(location, new Size(dimension.X, dimension.Y));
             info.DockedSize = rect;
