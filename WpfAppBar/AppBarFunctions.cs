@@ -243,12 +243,23 @@ namespace WpfAppBar
 
         private static Rect GetActualWorkArea(RegisterInfo info)
         {
-            var wa = SystemParameters.WorkArea;
+            var hWnd = new WindowInteropHelper(info.Window).Handle;
+            var cwa = GetMonitorWorkArea(Interop.MonitorFromWindow(hWnd, Interop.MonitorDefaultTo.MONITOR_DEFAULTTONEAREST));
+            var wa = new Rect(new Point(cwa.left, cwa.top), new Point(cwa.right, cwa.bottom));
+
             if (info.DockedSize != null)
             {
                 wa.Union(info.DockedSize.Value);
             }
             return wa;
+        }
+
+        private static Interop.RECT GetMonitorWorkArea(IntPtr hMonitor)
+        {
+            var monitorInfo = new Interop.MONITORINFO();
+            monitorInfo.cbSize = Marshal.SizeOf(monitorInfo);
+            Interop.GetMonitorInfo(hMonitor, ref monitorInfo);
+            return monitorInfo.rcWork;
         }
     }
 }

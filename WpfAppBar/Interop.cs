@@ -74,6 +74,22 @@ namespace WpfAppBar
             ABN_WINDOWARRANGE
         }
 
+        internal enum MonitorDefaultTo
+        {
+            MONITOR_DEFAULTTONULL,
+            MONITOR_DEFAULTTOPRIMARY,
+            MONITOR_DEFAULTTONEAREST
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct MONITORINFO
+        {
+            public int cbSize;
+            public RECT rcMonitor;
+            public RECT rcWork;
+            public uint dwFlags;
+        }
+
         [DllImport("SHELL32", CallingConvention = CallingConvention.StdCall)]
         internal static extern uint SHAppBarMessage(int dwMessage, ref APPBARDATA pData);
 
@@ -82,5 +98,11 @@ namespace WpfAppBar
         
         [DllImport("dwmapi.dll")]
         internal static extern int DwmSetWindowAttribute(IntPtr hWnd, int attr, ref int attrValue, int attrSize);
+
+        [DllImport("User32.dll")]
+        internal static extern IntPtr MonitorFromWindow(IntPtr hWnd, MonitorDefaultTo dwFlags);
+
+        [DllImport("User32.dll")]
+        internal static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
     }
 }
