@@ -6,10 +6,10 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>    
-    <projectUrl>http://stackoverflow.com/a/84987/12643</projectUrl>    
+    <projectUrl>https://github.com/PhilipRieck/WpfAppBar</projectUrl>    
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Workarea issues fixed</releaseNotes>
+    <releaseNotes>Add support for .net core 3 (via StummeJ)</releaseNotes>
     <copyright>Creative Commons CC0 ( https://creativecommons.org/publicdomain/zero/1.0/ )</copyright>
     <tags>WPF AppBar</tags>
   </metadata>
