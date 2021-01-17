@@ -1,6 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
-    <TargetFrameworks>net4.5</TargetFrameworks>
+    <TargetFrameworks>net5.0-windows</TargetFrameworks>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
 
@@ -11,13 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xaml" />
-    
-    <PackageReference Include="WindowsBase" Version="4.6.1055.0" />
     <ProjectReference Include="..\WpfAppBar\WpfAppBar.csproj" />
   </ItemGroup>
+  
 </Project>
